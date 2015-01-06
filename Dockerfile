@@ -18,10 +18,11 @@ WORKDIR /home
 
 # Clone the repository
 RUN git clone https://github.com/benwbrum/fromthepage.git
-RUN cd fromthepage; bundle install
 
 # Install required gems
 #    bundle install
+RUN cd fromthepage; bundle install
+
 # Configure MySQL
 # Create a database and user account for FromThePage to use.
 # Then update the config/database.yml file to point to the MySQL user account and database you created above.
