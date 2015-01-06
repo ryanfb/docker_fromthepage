@@ -28,7 +28,8 @@ RUN cd fromthepage; bundle install
 # Run
 #    rake db:migrate
 # to load the schema definition into the database account.
-#
+RUN service mysql restart; cd fromthepage; rake db:create; rake db:migrate
+
 # Finally, start the application
-#
-#    rails server
+EXPOSE 3000
+CMD service mysql restart; cd fromthepage; rails server
