@@ -1,11 +1,11 @@
-FROM ubuntu
+FROM phusion/passenger-ruby21
 MAINTAINER Ryan Baumann <ryan.baumann@gmail.com>
 
 # Install the Ubuntu packages.
 RUN apt-get update
 
 # Install Ruby, RubyGems, Bundler, ImageMagick, MySQL and Git
-RUN apt-get install -y bundler imagemagick mysql-server git graphviz
+RUN apt-get install -y imagemagick mysql-server git graphviz
 # Install build deps for gems installed by bundler
 RUN apt-get build-dep -y ruby-mysql2 ruby-rmagick
 
@@ -21,6 +21,7 @@ RUN git clone https://github.com/benwbrum/fromthepage.git
 
 # Install required gems
 #    bundle install
+RUN gem install bundler
 RUN cd fromthepage; bundle install
 
 # Configure MySQL
@@ -29,8 +30,8 @@ RUN cd fromthepage; bundle install
 # Run
 #    rake db:migrate
 # to load the schema definition into the database account.
-RUN service mysql restart; cd fromthepage; rake db:create; rake db:migrate
+RUN service mysql restart; cd fromthepage; bundle exec rake db:create; bundle exec rake db:migrate
 
 # Finally, start the application
 EXPOSE 3000
-CMD service mysql restart; cd fromthepage; rails server
+CMD service mysql restart; cd fromthepage; bundle exec rails server
