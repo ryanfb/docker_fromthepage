@@ -1,13 +1,18 @@
-FROM phusion/passenger-ruby21
+FROM phusion/passenger-ruby22
 MAINTAINER Ryan Baumann <ryan.baumann@gmail.com>
 
 # Install the Ubuntu packages.
-RUN apt-get update
-
 # Install Ruby, RubyGems, Bundler, ImageMagick, MySQL and Git
-RUN apt-get install -y imagemagick mysql-server git graphviz
+# Install qt4/qtwebkit libraries for capybara
 # Install build deps for gems installed by bundler
-RUN apt-get build-dep -y ruby-mysql2 ruby-rmagick
+RUN add-apt-repository 'deb http://archive.ubuntu.com/ubuntu trusty universe'
+RUN apt-get update && apt-get install -y imagemagick libmagickwand-dev \
+    mysql-server-5.6 mysql-client-5.6 git graphviz tzdata \
+    libqt4-dev libqtwebkit-dev build-essential && \
+    apt-get install -y \
+      $(apt-get -s build-dep ruby-rmagick | grep '^(Inst|Conf) ' | cut -d' ' -f2 | fgrep -v 'ruby') && \
+    apt-get install -y \
+      $(apt-get -s build-dep ruby-mysql2 | grep '^(Inst|Conf) ' | cut -d' ' -f2 | fgrep -v -e 'mysql-' -e 'ruby')
 
 # Set the locale.
 RUN locale-gen en_US.UTF-8
@@ -22,7 +27,9 @@ RUN git clone https://github.com/benwbrum/fromthepage.git
 # Install required gems
 #    bundle install
 RUN gem install bundler
-RUN cd fromthepage; bundle install
+ADD Gemfile /home/fromthepage/Gemfile
+RUN cd fromthepage; bundle update mysql2 && bundle install
+# RUN service mysql restart; ruby --version && mysql -V && false
 
 # Configure MySQL
 # Create a database and user account for FromThePage to use.
