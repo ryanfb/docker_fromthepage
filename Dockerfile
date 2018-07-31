@@ -1,4 +1,4 @@
-FROM phusion/passenger-ruby22
+FROM phusion/passenger-ruby23
 MAINTAINER Ryan Baumann <ryan.baumann@gmail.com>
 
 # Install the Ubuntu packages.
