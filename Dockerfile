@@ -27,8 +27,7 @@ RUN git clone https://github.com/benwbrum/fromthepage.git
 # Install required gems
 #    bundle install
 RUN gem install bundler
-ADD Gemfile /home/fromthepage/Gemfile
-RUN cd fromthepage; bundle update mysql2 && bundle install
+RUN cd fromthepage; bundle install
 # RUN service mysql restart; ruby --version && mysql -V && false
 
 # Configure MySQL
