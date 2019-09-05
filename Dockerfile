@@ -36,8 +36,8 @@ RUN cd fromthepage; bundle install
 # Run
 #    rake db:migrate
 # to load the schema definition into the database account.
-RUN service mysql restart; cd fromthepage; bundle exec rake db:create; bundle exec rake db:migrate
+RUN find /var/lib/mysql -type f -exec touch {} \; && service mysql restart; cd fromthepage; bundle exec rake db:create; bundle exec rake db:migrate
 
 # Finally, start the application
 EXPOSE 3000
-CMD service mysql restart; cd fromthepage; bundle exec rails server
+CMD find /var/lib/mysql -type f -exec touch {} \; && service mysql restart; cd fromthepage; bundle exec rails server
