@@ -1,14 +1,14 @@
-FROM phusion/passenger-ruby23
+FROM phusion/passenger-ruby27
 MAINTAINER Ryan Baumann <ryan.baumann@gmail.com>
 
 # Install the Ubuntu packages.
 # Install Ruby, RubyGems, Bundler, ImageMagick, MySQL and Git
 # Install qt4/qtwebkit libraries for capybara
 # Install build deps for gems installed by bundler
-RUN add-apt-repository 'deb http://archive.ubuntu.com/ubuntu trusty universe'
+RUN add-apt-repository 'deb http://archive.ubuntu.com/ubuntu focal universe'
 RUN apt-get update && apt-get install -y imagemagick libmagickwand-dev \
-    mysql-server-5.6 mysql-client-5.6 git graphviz tzdata \
-    libqt4-dev libqtwebkit-dev build-essential && \
+    git graphviz tzdata \
+    build-essential && \
     apt-get install -y \
       $(apt-get -s build-dep ruby-rmagick | grep '^(Inst|Conf) ' | cut -d' ' -f2 | fgrep -v 'ruby') && \
     apt-get install -y \
@@ -23,11 +23,13 @@ WORKDIR /home
 
 # Clone the repository
 RUN git clone https://github.com/benwbrum/fromthepage.git
+COPY database.sqlite.yml /home/fromthepage/config/database.sqlite.yml
+COPY database.mysql.yml /home/fromthepage/config/database.mysql.yml
 
 # Install required gems
 #    bundle install
 RUN gem install bundler
-RUN cd fromthepage; bundle install
+RUN cd fromthepage; bundle install; bundle add sqlite3
 # RUN service mysql restart; ruby --version && mysql -V && false
 
 # Configure MySQL
@@ -36,8 +38,11 @@ RUN cd fromthepage; bundle install
 # Run
 #    rake db:migrate
 # to load the schema definition into the database account.
-RUN find /var/lib/mysql -type f -exec touch {} \; && service mysql restart; cd fromthepage; bundle exec rake db:create; bundle exec rake db:migrate
+# RUN find /var/lib/mysql -type f -exec touch {} \; && service mysql restart; cd fromthepage; bundle exec rake db:create; bundle exec rake db:migrate
 
 # Finally, start the application
+WORKDIR /home/fromthepage
 EXPOSE 3000
-CMD find /var/lib/mysql -type f -exec touch {} \; && service mysql restart; cd fromthepage; bundle exec rails server
+ENV DATABASE_ADAPTER sqlite
+# CMD find /var/lib/mysql -type f -exec touch {} \; && service mysql restart; cd fromthepage; bundle exec rails server
+CMD sleep 5 && cp -v config/database.$DATABASE_ADAPTER.yml config/database.yml && bundle exec rails db:prepare && bundle exec rails server -b 0.0.0.0
