@@ -33,7 +33,7 @@ RUN cd fromthepage; bundle install; bundle add sqlite3
 # RUN service mysql restart; ruby --version && mysql -V && false
 
 # Configure MySQL
-# Create a database and user account for FromThePage to use.
+
 # Then update the config/database.yml file to point to the MySQL user account and database you created above.
 # Run
 #    rake db:migrate
@@ -44,5 +44,7 @@ RUN cd fromthepage; bundle install; bundle add sqlite3
 WORKDIR /home/fromthepage
 EXPOSE 3000
 ENV DATABASE_ADAPTER sqlite
+VOLUME /data
 # CMD find /var/lib/mysql -type f -exec touch {} \; && service mysql restart; cd fromthepage; bundle exec rails server
-CMD sleep 5 && cp -v config/database.$DATABASE_ADAPTER.yml config/database.yml && bundle exec rails db:prepare && bundle exec rails server -b 0.0.0.0
+COPY fromthepage.sh /home/fromthepage/fromthepage.sh
+CMD ./fromthepage.sh
