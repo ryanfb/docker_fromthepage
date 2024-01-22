@@ -7,7 +7,7 @@ services:
     links:
     - "mysql"
     ports:
-    - "3000"
+    - "3000:3000"
     volumes:
       - fromthepage_config:/home/fromthepage/config
   mysql:
