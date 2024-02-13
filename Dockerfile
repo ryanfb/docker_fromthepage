@@ -22,7 +22,7 @@ ENV LC_ALL en_US.UTF-8
 WORKDIR /home
 
 # Clone the repository
-RUN git clone https://github.com/benwbrum/fromthepage.git
+RUN git clone https://github.com/Simon-Dirks/fromthepage.git
 COPY database.sqlite.yml /home/fromthepage/config/database.sqlite.yml
 COPY database.mysql.yml /home/fromthepage/config/database.mysql.yml
 
